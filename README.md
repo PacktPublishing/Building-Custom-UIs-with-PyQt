@@ -1,1 +1,1 @@
-# Professional-GUI-development-with-PyQt
+# Building Custom UIs with PyQt
