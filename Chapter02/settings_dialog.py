@@ -60,7 +60,7 @@ class SettingsDialog(QDialog):
         self.author_name = QLineEdit()
         self.author_name.setMinimumWidth(160)
 
-        self.button_box = QDialogButtonBox(QDialogButtonBox.StandardButtons.Ok | QDialogButtonBox.StandardButtons.Cancel)
+        self.button_box = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok | QDialogButtonBox.StandardButton.Cancel)
         self.button_box.accepted.connect(self.accept)
         self.button_box.rejected.connect(self.reject)
 
