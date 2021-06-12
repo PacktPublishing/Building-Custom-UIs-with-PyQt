@@ -11,7 +11,7 @@ import sys
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QPushButton, 
     QRadioButton, QLineEdit, QTextEdit, QDialog, QDialogButtonBox, 
     QColorDialog, QFrame, QVBoxLayout, QFormLayout)
-from PyQt6.QtCore import Qt, QSysInfo
+from PyQt6.QtCore import QSysInfo
 from PyQt6.QtGui import QAction
 
 class HorizontalSeparator(QFrame):
