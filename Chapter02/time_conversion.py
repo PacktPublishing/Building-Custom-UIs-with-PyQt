@@ -1,4 +1,5 @@
-"""Small example of changes to QDateTime in PyQt6 
+"""Convert QDateTime values in PyQt6 
+Question 3 - Using QLocale to convert dates and time
 Similar changes can also be found in QDate and QTime
 
 PyQt QDateTime documentation:
