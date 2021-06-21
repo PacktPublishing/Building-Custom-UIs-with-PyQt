@@ -1,5 +1,5 @@
 """Settings Manager Dialog 
-Question 5 – Create the main window and Settings dialog
+Question 6 – Create the main window and Settings dialog
 
 Building Custom UIs with PyQt with Packt Publishing
 Chapter 2 - Building the Foundation for GUIs
