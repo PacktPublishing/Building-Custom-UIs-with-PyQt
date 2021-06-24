@@ -18,7 +18,5 @@ Open a terminal, navigate to the root directory, and run:
 ```
 $ python3 main.py
 ```
----
 **NOTE**
 For Windows use python instead of python3.
----
