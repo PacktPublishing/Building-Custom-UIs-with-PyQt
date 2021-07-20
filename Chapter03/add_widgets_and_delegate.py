@@ -120,7 +120,7 @@ class MainWindow(QMainWindow):
     def initializeUI(self):
         """Initialize settings, call functions that define 
         UI elements, and display the main window."""  
-        self.setWindowTitle("Adding Widgets to QTableView Cells")
+        self.setWindowTitle("Creating a Custom Date Edit Delegate")
         self.setMinimumSize(500, 400)
  
         self.setUpMainWindow()
