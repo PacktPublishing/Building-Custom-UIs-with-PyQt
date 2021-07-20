@@ -52,7 +52,7 @@ class EditCellWidget(QWidget):
         # Display name and date in a QMessageBox
         QMessageBox.information(self, "User Information",
             f"""Name: {name}<br>
-            <b>Birthdate: </b>{date_edit_widget.date().toString("M/dd/yyyy")}""")
+            <b>Birthdate: </b>{date_edit_widget.date().toString("MM/dd/yyyy")}""")
 
     def deleteTableRows(self):
         """Method that demonstrates how to delete the rows from the table."""
@@ -107,8 +107,9 @@ class MainWindow(QMainWindow):
             # row and column (here the column is 1)
             index = table_view.model().sibling(row, 1, QModelIndex())
             date_edit = QDateEdit(QDate.currentDate()) # Create QDateEdit object that starts at current date
-            date_edit.setAlignment(Qt.AlignmentFlag.AlignRight) # Align the text
             date_edit.setDateRange(QDate(1900, 1, 1), QDate.currentDate())
+            date_edit.setDisplayFormat("MM/dd/yyyy")
+            date_edit.setAlignment(Qt.AlignmentFlag.AlignRight) # Align the text
             table_view.setIndexWidget(index, date_edit)
             # Set the widgets in the final column for each row
             index = table_view.model().sibling(row, 2, QModelIndex())
