@@ -8,7 +8,7 @@ Created by: Joshua Willman
 # Import necessary modules
 import sys 
 from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, 
-    QLabel, QPushButton, QComboBox, QDateEdit, QTableView, QMessageBox,
+    QLabel, QPushButton, QDateEdit, QTableView, QMessageBox,
     QHeaderView, QHBoxLayout, QVBoxLayout, QAbstractItemView)
 from PyQt6.QtCore import Qt, QDate, QModelIndex
 from PyQt6.QtGui import QIcon, QStandardItemModel, QStandardItem
