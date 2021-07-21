@@ -20,6 +20,7 @@ class EditCellWidget(QWidget):
         for items added to QTableView cells """
         super().__init__()
         self.table_view = table_view
+        self.setAutoFillBackground(True) # Prevent the background from showing when editing
 
         view_button = QPushButton(QIcon("icons/view.png"), None)
         view_button.clicked.connect(self.displayItemValues)
@@ -110,6 +111,7 @@ class MainWindow(QMainWindow):
             date_edit.setDateRange(QDate(1900, 1, 1), QDate.currentDate())
             date_edit.setDisplayFormat("MM/dd/yyyy")
             date_edit.setAlignment(Qt.AlignmentFlag.AlignRight) # Align the text
+            date_edit.setAutoFillBackground(True)
             table_view.setIndexWidget(index, date_edit)
             # Set the widgets in the final column for each row
             index = table_view.model().sibling(row, 2, QModelIndex())

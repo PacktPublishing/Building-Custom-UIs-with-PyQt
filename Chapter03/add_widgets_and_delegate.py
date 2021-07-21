@@ -66,6 +66,7 @@ class EditCellWidget(QWidget):
         for items added to QTableView cells """
         super().__init__()
         self.table_view = table_view
+        self.setAutoFillBackground(True)
 
         view_button = QPushButton(QIcon("icons/view.png"), None)
         view_button.clicked.connect(self.displayItemValues)
