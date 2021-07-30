@@ -1,4 +1,4 @@
-"""Question 6 - Demonstrate how to add widgets and a simple custom 
+"""Question 7 - Demonstrate how to add widgets and a simple custom 
 delegate into table views
 
 NOTE: An error occurs if the user is editing data in the QDateEdit editor 
