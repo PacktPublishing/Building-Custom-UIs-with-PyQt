@@ -1,4 +1,4 @@
-"""Question 5 - Demonstrate how to add widgets into table views
+"""Question 6 - Demonstrate how to add widgets into table views
 
 Building Custom UIs with PyQt with Packt Publishing
 Chapter 3 - Getting More Out of PyQt’s Model/View Programming
