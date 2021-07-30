@@ -1,4 +1,4 @@
-"""Question 4 - QCompleter Example GUI
+"""Question 5 - QCompleter Example GUI
 
 This example demonstrates how to set up QCompleter to use 
 and share a model. There are a number of ways to improve the 
