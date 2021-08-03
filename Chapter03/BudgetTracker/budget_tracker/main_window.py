@@ -33,11 +33,16 @@ class MainWindow(QMainWindow):
         income, expenses = self.loadBudgetData()
 
         # Create the 3 tables for displaying the user's income data
-        self.income_table = SpendingsTableView(headers=["Money In", ""], data=income)
-        self.expenses_table = SpendingsTableView(headers=["Money Out", ""], data=expenses)
-        self.remaining_table = TotalTableView(["Money Left Over", ""])
-        self.income_table.totals_updated.connect(self.remaining_table.updateTotalsRow)
-        self.expenses_table.totals_updated.connect(self.remaining_table.updateTotalsRow)
+        self.income_table = SpendingsTableView(
+            headers=["Money In", ""], data=income)
+        self.expenses_table = SpendingsTableView(
+            headers=["Money Out", ""], data=expenses)
+        self.remaining_table = TotalTableView(
+            ["Money Left Over", ""])
+        self.income_table.totals_updated.connect(
+            self.remaining_table.updateTotalsRow)
+        self.expenses_table.totals_updated.connect(
+            self.remaining_table.updateTotalsRow)
 
         tables_v_box = QVBoxLayout()
         tables_v_box.addWidget(self.income_table)
@@ -49,7 +54,7 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.main_container)
 
     def loadBudgetData(self):
-        """ """
+        """Load the budget data from a file."""
         if os.path.exists(self.file_name):
             with open(self.file_name, "r") as in_file:
                 data = json.load(in_file) # Returns dict
@@ -63,7 +68,7 @@ class MainWindow(QMainWindow):
                 return [["", "$0.00"]], [["", "$0.00"]]
     
     def saveBudgetData(self):
-        """ """
+        """Save the information in the tables."""
         # Collect the information for both tables by accessing the 
         # _data lists
         income_data = self.income_table.model._data 
