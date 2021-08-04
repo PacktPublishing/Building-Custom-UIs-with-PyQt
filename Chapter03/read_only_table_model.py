@@ -2,6 +2,9 @@
 Question 3 - Demonstrates how to implement a simple 
 custom read-only QAbstractTableModel and how to use roles.
 
+You will notice some lag when resizing the window. 
+This issue will be discussed in Chapter 4, Handling Data with PyQt. 
+
 Dataset used in this application can be found at https://data.ny.gov and 
 https://data.ny.gov/Recreation/Recommended-Fishing-Rivers-And-Streams/jcxg-7gnm.
 License terms are found at https://data.ny.gov/download/77gx-ii52/application/pdf.

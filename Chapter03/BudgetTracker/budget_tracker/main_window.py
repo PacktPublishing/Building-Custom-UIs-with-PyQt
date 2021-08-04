@@ -10,7 +10,8 @@ import os, sys, json
 from PyQt6.QtWidgets import (QApplication, QMainWindow, 
     QWidget, QVBoxLayout)
 # Import relative modules 
-from .model_view.views import SpendingsTableView, TotalTableView
+from .model_view.views import (SpendingsTableView, 
+    TotalTableView)
 
 class MainWindow(QMainWindow):
 

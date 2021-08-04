@@ -1,10 +1,15 @@
-"""Question 5 - QCompleter Example GUI
+"""Question 4 - QCompleter Example GUI
 
 This example demonstrates how to set up QCompleter to use 
 and share a model. There are a number of ways to improve the 
 GUI, such as making the selected item/text in the QListView
 appear in the QLineEdit or fine-tuning when items are selected
 using QCompleter. 
+
+QCompleter can be used as an editing widget for autocompleting 
+text. A model can also be passed to QCompleter to provide a 
+data source to the adaptor. This can be useful for locating 
+and navigating to values located in a view. 
 
 Building Custom UIs with PyQt with Packt Publishing
 Chapter 3 - Getting More Out of PyQt’s Model/View Programming
@@ -76,6 +81,7 @@ class MainWindow(QMainWindow):
         # Create a model instance and pass the list of words to the model
         model = ListModel(list_view, list_of_words)
         list_view.setModel(model)
+        #model.
 
         # Create QCompleter object that shares the same model as the QListView
         completer = QCompleter(list_of_words)
@@ -92,6 +98,12 @@ class MainWindow(QMainWindow):
         word_group_box = QGroupBox("Keywords")
         word_group_box.setLayout(main_v_box)
         self.setCentralWidget(word_group_box)
+
+    def scrollToFoundItem(self, parent, start, row):
+        # If an item is located, highlight it using the selection model and 
+        # scoll to the item
+        self.parent.selectionModel().setCurrentIndex(index, QItemSelectionModel.SelectionFlag.SelectCurrent)
+        self.parent.scrollTo(index, QAbstractItemView.ScrollHint.PositionAtCenter)
 
     def loadWordsFromFile(self):
         """Returns a list of words from the text file."""

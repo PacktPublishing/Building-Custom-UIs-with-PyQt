@@ -136,7 +136,8 @@ class TotalTableView(QTableView):
                 totals_list[1].replace("$", ""))
             difference = income - expenses
 
-            remaining = f"${difference:.2f}" # Convert to a string 
+            # Convert the difference to a string and update the model/view
+            difference_str = f"${difference:.2f}" # Convert to a string 
             index = self.model.index(0, 1, QModelIndex())
             self.model.setData(index, 
-                remaining, Qt.ItemDataRole.EditRole)
+                difference_str, Qt.ItemDataRole.EditRole)

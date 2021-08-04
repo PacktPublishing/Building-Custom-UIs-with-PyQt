@@ -1,4 +1,8 @@
-"""Question 6 - Demonstrate how to add widgets into table views
+"""Question 5 - Demonstrate how to add widgets into table views
+
+Rather than use delegates for rendering and editing items, it 
+is sometimes desirable to simply insert widgets into a view 
+to display static content. 
 
 Building Custom UIs with PyQt with Packt Publishing
 Chapter 3 - Getting More Out of PyQt’s Model/View Programming
