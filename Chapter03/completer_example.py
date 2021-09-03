@@ -81,7 +81,6 @@ class MainWindow(QMainWindow):
         # Create a model instance and pass the list of words to the model
         model = ListModel(list_view, list_of_words)
         list_view.setModel(model)
-        #model.
 
         # Create QCompleter object that shares the same model as the QListView
         completer = QCompleter(list_of_words)
@@ -98,12 +97,6 @@ class MainWindow(QMainWindow):
         word_group_box = QGroupBox("Keywords")
         word_group_box.setLayout(main_v_box)
         self.setCentralWidget(word_group_box)
-
-    def scrollToFoundItem(self, parent, start, row):
-        # If an item is located, highlight it using the selection model and 
-        # scoll to the item
-        self.parent.selectionModel().setCurrentIndex(index, QItemSelectionModel.SelectionFlag.SelectCurrent)
-        self.parent.scrollTo(index, QAbstractItemView.ScrollHint.PositionAtCenter)
 
     def loadWordsFromFile(self):
         """Returns a list of words from the text file."""
