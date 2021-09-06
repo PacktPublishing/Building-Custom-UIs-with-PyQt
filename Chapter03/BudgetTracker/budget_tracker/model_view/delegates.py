@@ -30,7 +30,7 @@ class IncomeSpinBox(QStyledItemDelegate):
         return editor
 
     def setEditorData(self, editor, index):
-        """Provide the widget and data to edit."""
+        """Provide the widget with data to edit."""
         # Get the current item's value from the model at the 
         # selected index
         value = index.model().data(
