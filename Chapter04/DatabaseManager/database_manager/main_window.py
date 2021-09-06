@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget,
 from PyQt6.QtCore import Qt, QSortFilterProxyModel
 from PyQt6.QtSql import (QSqlRelation, QSqlRelationalTableModel)
 # Import relative modules
-from .delegates.delegates import (PhoneDelegate, DateDelegate, 
+from .model_view.delegates import (PhoneDelegate, DateDelegate, 
     SqlRelationalDelegate, ReadOnlyDelegate)
 
 class MainWindow(QMainWindow):
