@@ -124,8 +124,7 @@ def insert_data_into_tables():
     # users[i][4] values represent boolean values, True = 1, False = 0
     users = [[None, "admin", "paSSw0rd!", 1], 
              [None, "employee01", "Godz!lla0", 0],
-             [None, "employee02", "C0d3r4L!fe", 0],
-             [None, "", "", 1]]
+             [None, "employee02", "C0d3r4L!fe", 0]]
 
     # Create random staff_id
     for user in users:
