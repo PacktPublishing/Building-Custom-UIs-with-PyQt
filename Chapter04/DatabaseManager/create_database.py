@@ -113,8 +113,8 @@ def random_dates(times):
 def insert_data_into_tables():
     """Create the mock data items and populate the tables."""
     # Set the number of users and orders in the database
-    number_of_users = 20
-    number_of_orders = 25
+    number_of_users = 2500
+    number_of_orders = 10000
 
     print("[INFO] Getting ready to insert data into the tables...")
 
