@@ -7,14 +7,16 @@ Created by: Joshua Willman
 
 # Import necessary modules
 import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, QWidget, 
-    QLabel, QCheckBox, QComboBox, QLineEdit, QTabWidget, 
-    QGroupBox, QTableView, QHeaderView, QHBoxLayout, QVBoxLayout) 
-from PyQt6.QtCore import Qt, QSortFilterProxyModel
+from PyQt6.QtWidgets import (QApplication, QMainWindow, 
+    QWidget, QLabel, QCheckBox, QComboBox, QLineEdit, 
+    QTabWidget, QGroupBox, QTableView, QHeaderView, 
+    QHBoxLayout, QVBoxLayout) 
+from PyQt6.QtCore import (Qt, 
+    QSortFilterProxyModel, QRegularExpression)
 from PyQt6.QtSql import (QSqlRelation, QSqlRelationalTableModel)
 # Import relative modules
-from .model_view.delegates import (PhoneDelegate, DateDelegate, 
-    SqlRelationalDelegate, ReadOnlyDelegate)
+from .model_view.delegates import (PhoneDelegate, 
+    DateDelegate, SqlProxyDelegate, ReadOnlyDelegate)
 
 class MainWindow(QMainWindow):
 
@@ -22,7 +24,7 @@ class MainWindow(QMainWindow):
         """ MainWindow Constructor """
         super().__init__()
         self.admin_or_not = admin_or_not # Used to grant the user admin privileges
-        self.current_proxy_model = None # Variable that refers to the current page's proxy mmodel
+        self.curr_proxy_model = None # Variable that refers to the current page's proxy mmodel
         self.initializeUI()
         
     def initializeUI(self):
@@ -37,7 +39,6 @@ class MainWindow(QMainWindow):
         # in the tab widget
         self.customer_tab = QWidget()
         self.orders_tab = QWidget()
-        self.details_tab = QWidget()
         self.category_tab = QWidget()
         self.products_tab = QWidget()
 
@@ -53,7 +54,8 @@ class MainWindow(QMainWindow):
             self.tabs.insertTab(0, self.staff_tab, "Staff")
             self.createStaffTab()
             self.tabs.setCurrentIndex(1) # Set tab to Customers tab
-        self.tabs.currentChanged.connect(self.updateWidgetsAndStates)
+        self.tabs.currentChanged.connect(
+            self.updateWidgetsAndStates)
 
         # Call the methods to construct each page
         self.createCustomersTab()
@@ -63,23 +65,29 @@ class MainWindow(QMainWindow):
 
         # Create the widgets in the sidebar for filtering table content
         self.table_name_label = QLabel("<b>Customers</b>")
-        self.table_name_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.table_name_label.setAlignment(
+            Qt.AlignmentFlag.AlignCenter)
 
         self.filter_pattern_line = QLineEdit()
         self.filter_pattern_line.setClearButtonEnabled(True)
         self.filter_pattern_line.textChanged.connect(self.filterRegExpChanged)
 
-        self.filter_syntax_combo = QComboBox()
-        filter_options = ["Default", "Wildcard", "Fixed String"]
-        self.filter_syntax_combo.addItems(filter_options)
-        self.filter_syntax_combo.currentIndexChanged.connect(self.filterRegExpChanged)
+        self.filter_regex_combo = QComboBox()
+        filter_options = ["Default", "Wildcard", 
+                          "Fixed String"]
+        self.filter_regex_combo.addItems(filter_options)
+        self.filter_regex_combo.currentIndexChanged.connect(
+            self.filterRegExpChanged)
 
-        self.filter_column_combo = QComboBox()
-        self.updateWidgetsAndStates(1) # Initialize the values in filter_column_combo
-        self.filter_column_combo.currentIndexChanged.connect(self.selectTableColumn)
+        self.filter_field_combo = QComboBox()
+        self.updateWidgetsAndStates(1) # Initialize the values in filter_field_combo
+        self.filter_field_combo.currentIndexChanged.connect(
+            self.selectTableColumn)
 
-        filter_case_sensitivity_cb = QCheckBox("Filter with Case Sensitivity")
-        filter_case_sensitivity_cb.toggled.connect(self.toggleCaseSensitivity)
+        filter_case_sensitivity_cb = QCheckBox(
+            "Filter with Case Sensitivity")
+        filter_case_sensitivity_cb.toggled.connect(
+            self.toggleCaseSensitivity)
         filter_case_sensitivity_cb.toggle()
 
         # Layout for the sidebar 
@@ -88,9 +96,9 @@ class MainWindow(QMainWindow):
         filter_v_box.addWidget(QLabel("Filter Pattern"))
         filter_v_box.addWidget(self.filter_pattern_line)
         filter_v_box.addWidget(QLabel("Filter Syntax"))
-        filter_v_box.addWidget(self.filter_syntax_combo)
+        filter_v_box.addWidget(self.filter_regex_combo)
         filter_v_box.addWidget(QLabel("Select Table Column"))
-        filter_v_box.addWidget(self.filter_column_combo)
+        filter_v_box.addWidget(self.filter_field_combo)
         filter_v_box.addWidget(filter_case_sensitivity_cb)
         filter_v_box.addStretch(2)
 
@@ -117,6 +125,7 @@ class MainWindow(QMainWindow):
         staff_proxy_model.setSourceModel(staff_sql_model)
 
         staff_table = QTableView()
+        staff_table.setSortingEnabled(True)
         staff_table.setModel(staff_proxy_model)
         staff_table.setItemDelegateForColumn(staff_sql_model.fieldIndex("staff_id"), ReadOnlyDelegate())
         staff_table.horizontalHeader().setSectionResizeMode(
@@ -130,8 +139,12 @@ class MainWindow(QMainWindow):
         """Create the page to view the Customers table from the database."""
         cust_sql_model = QSqlRelationalTableModel()
         cust_sql_model.setTable("Customers")  
-        cust_sql_model.setRelation(cust_sql_model.fieldIndex("staff_id"), QSqlRelation("Staff", "staff_id", "username"))
-        cust_sql_model.setHeaderData(cust_sql_model.fieldIndex("staff_id"), Qt.Orientation.Horizontal, "staff_username")
+        cust_sql_model.setRelation(
+            cust_sql_model.fieldIndex("staff_id"), 
+            QSqlRelation("Staff", "staff_id", "username"))
+        cust_sql_model.setHeaderData(
+            cust_sql_model.fieldIndex("staff_id"), 
+            Qt.Orientation.Horizontal, "staff_username")
         cust_sql_model.select() # Populate the model with data
 
         cust_proxy_model = QSortFilterProxyModel()
@@ -140,8 +153,10 @@ class MainWindow(QMainWindow):
         cust_table = QTableView()
         cust_table.setSortingEnabled(True)
         cust_table.setModel(cust_proxy_model)
-        cust_table.setItemDelegate(SqlRelationalDelegate(cust_table))
-        cust_table.setItemDelegateForColumn(cust_sql_model.fieldIndex("phone"), PhoneDelegate())
+        cust_table.setItemDelegate(SqlProxyDelegate(
+            cust_table))
+        cust_table.setItemDelegateForColumn(
+            cust_sql_model.fieldIndex("phone"), PhoneDelegate())
         cust_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch)
 
@@ -164,8 +179,11 @@ class MainWindow(QMainWindow):
         ord_table = QTableView()
         ord_table.setSortingEnabled(True)
         ord_table.setModel(ord_proxy_model)
-        ord_table.setItemDelegate(SqlRelationalDelegate(ord_table))
-        ord_table.setItemDelegateForColumn(ord_sql_model.fieldIndex("date_of_order"), DateDelegate())
+        ord_table.setItemDelegate(SqlProxyDelegate(
+            ord_table))
+        ord_table.setItemDelegateForColumn(
+            ord_sql_model.fieldIndex("date_of_order"), 
+            DateDelegate())
         ord_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch)
 
@@ -185,7 +203,9 @@ class MainWindow(QMainWindow):
         cat_table = QTableView()
         cat_table.setSortingEnabled(True)
         cat_table.setModel(cat_proxy_model)
-        cat_table.setItemDelegateForColumn(cat_sql_model.fieldIndex("category_id"), ReadOnlyDelegate())
+        cat_table.setItemDelegateForColumn(
+            cat_sql_model.fieldIndex("category_id"), 
+            ReadOnlyDelegate())
         cat_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch)
 
@@ -197,7 +217,10 @@ class MainWindow(QMainWindow):
         """Create the page to view the Products table from the database."""
         prod_sql_model = QSqlRelationalTableModel()
         prod_sql_model.setTable("Products")  
-        prod_sql_model.setRelation(prod_sql_model.fieldIndex("category_id"), QSqlRelation("Categories", "category_id", "category_name"))
+        prod_sql_model.setRelation(
+            prod_sql_model.fieldIndex("category_id"), 
+            QSqlRelation("Categories", "category_id", 
+            "category_name"))
         prod_sql_model.select() # Populate the model with data
 
         prod_proxy_model = QSortFilterProxyModel()
@@ -206,7 +229,8 @@ class MainWindow(QMainWindow):
         prod_table = QTableView()
         prod_table.setSortingEnabled(True)
         prod_table.setModel(prod_proxy_model)
-        prod_table.setItemDelegate(SqlRelationalDelegate(prod_table))
+        prod_table.setItemDelegate(SqlProxyDelegate(
+            prod_table))
         prod_table.horizontalHeader().setSectionResizeMode(
             QHeaderView.ResizeMode.Stretch)
 
@@ -218,28 +242,33 @@ class MainWindow(QMainWindow):
         """Slot for collecting the expression (exp) for filtering
         items in the tables. Expressions are then passed to various
         QSortFilterProxyModel methods depending upon the value in 
-        filter_syntax_combo."""
+        filter_regex_combo."""
         exp = self.filter_pattern_line.text()
-        syntax = self.filter_syntax_combo.currentText()
+        syntax = self.filter_regex_combo.currentText()
+        model = self.curr_proxy_model # NOTE: Used to shorten the length of the text for the book
 
         if syntax == "Default":
-            self.current_proxy_model.setFilterRegularExpression(exp)
+            model.setFilterRegularExpression(exp)
         if syntax == "Wildcard":
-            self.current_proxy_model.setFilterWildcard(exp)
+            regex = QRegularExpression()
+            wildcard = regex.wildcardToRegularExpression(
+                exp, 
+                QRegularExpression.WildcardConversionOption.UnanchoredWildcardConversion)            
+            model.setFilterRegularExpression(wildcard)
         if syntax == "Fixed String":
-            self.current_proxy_model.setFilterFixedString(exp)
+            model.setFilterFixedString(exp)
     
     def selectTableColumn(self, index):
         """Select the field (column) in the SQL table to be filtered."""
-        self.current_proxy_model.setFilterKeyColumn(index)
+        self.curr_proxy_model.setFilterKeyColumn(index)
 
     def toggleCaseSensitivity(self, toggled):
         """Toggle whether items are filtered with or without case sensitivity."""
         if toggled:
-            self.current_proxy_model.setFilterCaseSensitivity(
+            self.curr_proxy_model.setFilterCaseSensitivity(
                 Qt.CaseSensitivity.CaseSensitive)
         else:
-            self.current_proxy_model.setFilterCaseSensitivity(
+            self.curr_proxy_model.setFilterCaseSensitivity(
                 Qt.CaseSensitivity.CaseInsensitive)
 
     def updateWidgetsAndStates(self, index):
@@ -247,47 +276,56 @@ class MainWindow(QMainWindow):
         the tab selected, the current table's QSortFilterProxyModel, and information
         displayed in the sidebar for filtering."""            
         field_names = []   
-        self.filter_column_combo.clear()
-        current_table = self.tabs.currentWidget().findChild(QTableView)
+        self.filter_field_combo.clear()
+        curr_table = self.tabs.currentWidget().findChild(
+            QTableView)
+        curr_model = curr_table.model().sourceModel()
 
-        self.table_name_label.setText(f"<b>{current_table.model().sourceModel().tableName()}</b>")
-        self.current_proxy_model = current_table.model()
+        # Set text to display current table's name in the sidebar
+        self.table_name_label.setText(
+            f"<b>{curr_model.tableName()}</b>")
+        self.curr_proxy_model = curr_table.model()
 
         # Update QComboBox values based on currently selected tab
-        for col in range(0, current_table.model().sourceModel().columnCount()):
-            field_names.append(current_table.model().sourceModel().record().fieldName(col))
-            if "first_name" in field_names:
-                field_names = ["customer_name" if i=="first_name" else i for i in field_names]
-        self.filter_column_combo.addItems(field_names)
+        for col in range(0, curr_model.columnCount()):
+            field_names.append(
+                curr_model.record().fieldName(col))
+            if curr_model.tableName() == "Orders" and \
+                "first_name" in field_names:
+                field_names = ["customer_name" 
+                               if n=="first_name" else n 
+                               for n in field_names]
+        self.filter_field_combo.addItems(field_names)
 
         # NOTE: To the reader, the following code differs slightly from the book. 
         # This portion is left here as reference should you need to use both 
         # QSqlTableModel and QSqlRelationalTableModel classes. Simply replace the code 
         # above with the code below.
         """
-        if isinstance(current_table.model(), QSqlRelationalTableModel):
-            self.table_name_label.setText(f"<b>{current_table.model().tableName()}</b>")
+        if isinstance(curr_table.model(), QSqlRelationalTableModel):
+            self.table_name_label.setText(f"<b>{curr_table.model().tableName()}</b>")
 
             # Update QComboBox values based on currently selected tab
-            for col in range(0, current_table.model().columnCount()):
-                field_names.append(current_table.model().record().fieldName(col))
-            self.filter_column_combo.addItems(field_names)
+            for col in range(0, curr_table.model().columnCount()):
+                field_names.append(curr_table.model().record().fieldName(col))
+            self.filter_field_combo.addItems(field_names)
 
-        elif isinstance(current_table.model(), QSortFilterProxyModel):
-            self.table_name_label.setText(f"<b>{current_table.model().sourceModel().tableName()}</b>")
-            self.current_proxy_model = current_table.model()
+        elif isinstance(curr_table.model(), QSortFilterProxyModel):
+            self.table_name_label.setText(f"<b>{curr_model.tableName()}</b>")
+            self.curr_proxy_model = curr_table.model()
 
             # Update QComboBox values based on currently selected tab
-            for col in range(0, current_table.model().sourceModel().columnCount()):
-                field_names.append(current_table.model().sourceModel().record().fieldName(col))
+            for col in range(0, curr_model.columnCount()):
+                field_names.append(curr_model.record().fieldName(col))
                 if "first_name" in field_names:
                     field_names = ["customer_name" if i=="first_name" else i for i in field_names]
-            self.filter_column_combo.addItems(field_names)
+            self.filter_field_combo.addItems(field_names)
         """
 
     def closeEvent(self, event):
         """Close database connection when window is closed."""
-        self.current_proxy_model.sourceModel().database().close()
+        model = self.curr_proxy_model.sourceModel()
+        model.database().close()
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

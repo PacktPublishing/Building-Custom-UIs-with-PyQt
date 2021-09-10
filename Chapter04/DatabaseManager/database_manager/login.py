@@ -47,21 +47,21 @@ class LoginWindow(QDialog):
 
         username_label = QLabel("Username:")
         self.username_line = QLineEdit()
-        self.username_line.textChanged.connect(
+        self.username_line.textEdited.connect(
             self.replaceText)
 
         password_label = QLabel("Password:")
         self.password_line = QLineEdit()
         self.password_line.setEchoMode(
             QLineEdit.EchoMode.Password)
-        self.password_line.textChanged.connect(
+        self.password_line.textEdited.connect(
             self.replaceText)
 
         button_box = QDialogButtonBox()
         button_box.addButton("Log In", 
             QDialogButtonBox.ButtonRole.AcceptRole)
         button_box.accepted.connect(
-            self.clickLogInButton)
+            self.clickedLogInButton)
 
         log_in_grid = QGridLayout()
         log_in_grid.addWidget(header_label, 0, 0, 1, 3, Qt.AlignmentFlag.AlignCenter)
@@ -77,18 +77,30 @@ class LoginWindow(QDialog):
         """Create a QSqlDatabase object and connect to the database."""
         database = QSqlDatabase.addDatabase("QSQLITE") 
         database.setDatabaseName("data/inventory.db") 
+        database.setConnectOptions("QSQLITE_ENABLE_REGEXP")
         if not database.open():
             error = database.lastError().text()
-            QMessageBox.critical(self, "Connection Error",
+            QMessageBox.critical(QApplication.activeWindow(), 
+                "Connection Error",
                 f"Something went wrong: {error}")
-            sys.exit(1)   
+            sys.exit(1)     
+
+        # Handle if the database is missing and SQLite creates a new,
+        # empty database
+        tables_needed = {"Staff", "Customers", "Orders", 
+            "Products", "Categories"}
+        no_tables = tables_needed - set(database.tables())
+        if no_tables:
+            QMessageBox.critical(QApplication.activeWindow(), 
+                "Error", f'{no_tables} missing.')
+            sys.exit(1) 
 
     def replaceText(self, text):
         """Slot for resetting the information label's text."""
         self.info_label.setText(
             "<p style='color:#65888C'>Sign into your account.</p>")          
 
-    def clickLogInButton(self):
+    def clickedLogInButton(self):
         """Check the user's username and password information from 
         the database to determine if they are able to log in."""
         username = self.username_line.text()

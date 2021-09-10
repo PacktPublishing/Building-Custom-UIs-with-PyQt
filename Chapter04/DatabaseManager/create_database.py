@@ -35,7 +35,6 @@ def create_database_objects():
     # Create connection to the database
     database = QSqlDatabase.addDatabase("QSQLITE") # SQLite 3
     database.setDatabaseName("data/inventory.db")
-
     if not database.open():
         print("Unable to open data source file.")
         print("Connection failed: ", 
@@ -50,8 +49,6 @@ def create_database_objects():
     query.exec("DROP TABLE IF EXISTS Orders")
     query.exec("DROP TABLE IF EXISTS Products")
     query.exec("DROP TABLE IF EXISTS Categories")
-
-    query.exec("PRAGMA foreign_keys = ON")
 
     print("[INFO] Connected to database. Creating tables...")
 
@@ -73,6 +70,7 @@ def create_database_objects():
         staff_id VARCHAR REFERENCES Staff (staff_id) ON DELETE CASCADE ON UPDATE CASCADE)""") 
 
     # Create Categories table
+    # category_id values are auto incremented using INTEGER PRIMARY KEY
     query.exec("""CREATE TABLE Categories (
         category_id INTEGER PRIMARY KEY UNIQUE NOT NULL,
         category_name VARCHAR (40) NOT NULL, 
@@ -113,8 +111,8 @@ def random_dates(times):
 def insert_data_into_tables():
     """Create the mock data items and populate the tables."""
     # Set the number of users and orders in the database
-    number_of_users = 2500
-    number_of_orders = 10000
+    number_of_users = 500
+    number_of_orders = 1000
 
     print("[INFO] Getting ready to insert data into the tables...")
 
@@ -211,7 +209,7 @@ def insert_data_into_tables():
     categories = []
     # Read in all information for the products table
     # NOTE: The products.csv file contains both product and category info
-    with open("data/products.csv", "r", newline="") as csv_f:
+    with open("data/products.csv", "r", newline="", encoding="utf-8") as csv_f:
         reader = csv.reader(csv_f)
         header_labels = next(reader) # Skip headers in csv file
         products = list(reader)
@@ -280,17 +278,17 @@ def insert_data_into_tables():
 
     # Create a set (actually a list in order to keep track of the order) 
     # of all possible categories
-    categories_set = []
+    category_set = []
     for sublist in categories:
-        if sublist not in categories_set:
-            categories_set.append(sublist)  
+        if sublist not in category_set:
+            category_set.append(sublist)  
 
     # Positional binding to insert records into the Categories table
     query.prepare("""INSERT INTO Categories (
                   category_name, 
                   category_description) VALUES (?, ?)""")
     # Add values to the query to be inserted into the Categories table
-    for category in categories_set:
+    for category in category_set:
         name = category[0] 
         description = category[1]
         query.addBindValue(name)
@@ -310,7 +308,8 @@ def insert_data_into_tables():
         name = products[i][1]
         description = products[i][5]
         price = float(products[i][4])
-        category_id = categories_set.index(categories[i]) + 1
+        category_id = category_set.index(
+            categories[i]) + 1
         query.addBindValue(id)
         query.addBindValue(name)
         query.addBindValue(description)
