@@ -7,12 +7,11 @@ Created by: Joshua Willman
 
 # Import necessary modules
 import sys
-from PyQt6.QtWidgets import (QApplication, QMainWindow, 
+from PyQt6.QtWidgets import (QApplication, QMainWindow,  
     QWidget, QLabel, QCheckBox, QComboBox, QLineEdit, 
     QTabWidget, QGroupBox, QTableView, QHeaderView, 
-    QHBoxLayout, QVBoxLayout) 
-from PyQt6.QtCore import (Qt, 
-    QSortFilterProxyModel, QRegularExpression)
+    QHBoxLayout, QVBoxLayout, QStatusBar) 
+from PyQt6.QtCore import (Qt, QSortFilterProxyModel, QRegularExpression)
 from PyQt6.QtSql import (QSqlRelation, QSqlRelationalTableModel)
 # Import relative modules
 from .model_view.delegates import (PhoneDelegate, 
@@ -95,7 +94,7 @@ class MainWindow(QMainWindow):
         filter_v_box.addWidget(self.table_name_label)
         filter_v_box.addWidget(QLabel("Filter Pattern"))
         filter_v_box.addWidget(self.filter_pattern_line)
-        filter_v_box.addWidget(QLabel("Filter Syntax"))
+        filter_v_box.addWidget(QLabel("Filter filter"))
         filter_v_box.addWidget(self.filter_regex_combo)
         filter_v_box.addWidget(QLabel("Select Table Column"))
         filter_v_box.addWidget(self.filter_field_combo)
@@ -114,6 +113,9 @@ class MainWindow(QMainWindow):
         main_container = QWidget()
         main_container.setLayout(main_h_box)
         self.setCentralWidget(main_container)
+
+        # Create status bar
+        self.setStatusBar(QStatusBar()) 
 
     def createStaffTab(self):
         """Create the page to view the Staff table from the database."""
@@ -239,24 +241,33 @@ class MainWindow(QMainWindow):
         self.products_tab.setLayout(prod_h_box) 
 
     def filterRegExpChanged(self, value):
-        """Slot for collecting the expression (exp) for filtering
+        """Slot for collecting the expression (pattern) for filtering
         items in the tables. Expressions are then passed to various
         QSortFilterProxyModel methods depending upon the value in 
         filter_regex_combo."""
-        exp = self.filter_pattern_line.text()
-        syntax = self.filter_regex_combo.currentText()
-        model = self.curr_proxy_model # NOTE: Used to shorten the length of the text for the book
+        pattern = self.filter_pattern_line.text()
+        filter = self.filter_regex_combo.currentText()
+        model = self.curr_proxy_model
 
-        if syntax == "Default":
-            model.setFilterRegularExpression(exp)
-        if syntax == "Wildcard":
+        if filter == "Wildcard":
             regex = QRegularExpression()
-            wildcard = regex.wildcardToRegularExpression(
-                exp, 
-                QRegularExpression.WildcardConversionOption.UnanchoredWildcardConversion)            
-            model.setFilterRegularExpression(wildcard)
-        if syntax == "Fixed String":
-            model.setFilterFixedString(exp)
+            pattern = regex.wildcardToRegularExpression(
+                pattern, 
+                regex.WildcardConversionOption.UnanchoredWildcardConversion) 
+        elif filter == "Fixed String":
+            pattern = QRegularExpression.escape(pattern)
+
+        option = QRegularExpression.PatternOption.NoPatternOption
+        regex = QRegularExpression(pattern, option)
+        # Check whether or not the regular expression is valid or not
+        if regex.isValid():
+            model.setFilterRegularExpression(regex)
+        else:
+            # Display error message in the statusbar
+            self.statusBar().showMessage(
+                regex.errorString(), 4000)
+            model.setFilterRegularExpression(
+                QRegularExpression())
     
     def selectTableColumn(self, index):
         """Select the field (column) in the SQL table to be filtered."""
@@ -275,7 +286,6 @@ class MainWindow(QMainWindow):
         """Whenever the user switches a tab, update information regarding
         the tab selected, the current table's QSortFilterProxyModel, and information
         displayed in the sidebar for filtering."""            
-        field_names = []   
         self.filter_field_combo.clear()
         curr_table = self.tabs.currentWidget().findChild(
             QTableView)
@@ -287,6 +297,7 @@ class MainWindow(QMainWindow):
         self.curr_proxy_model = curr_table.model()
 
         # Update QComboBox values based on currently selected tab
+        field_names = []   
         for col in range(0, curr_model.columnCount()):
             field_names.append(
                 curr_model.record().fieldName(col))
